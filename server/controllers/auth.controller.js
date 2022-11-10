@@ -16,6 +16,8 @@ const signin = async (req, res) => {
 
         res.cookie('divineMole', token, { expires: new Date() + 9999 })
 
+        console.log(res);
+
         return res.json({
             token, 
             user: {
@@ -30,9 +32,21 @@ const signin = async (req, res) => {
 
 
 }
-const signout = (req, res) => {}
-// const requireSigin;
-const hasAuthorization = (req, res) => {}
+const signout = (req, res) => {
+    res.clearCookie("divineMole");
+    return res.status('200').json({
+        message: "signed out"
+    });
+}
+
+const requireSignin = expressJwt ({
+    secret: config.jwtSecret,
+    userProperty: 'auth'
+});
+
+const hasAuthorization = (req, res) => {
+    const authorized = req.profile && req.auth && req.profile._id == req.auth._id
+}
 
 export default { signin, signout, requireSignin, hasAuthorization }
 
