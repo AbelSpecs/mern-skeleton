@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -26,11 +27,16 @@ const UserSchema = new mongoose.Schema({
 
 });
 
+// need to change virtual to pre .save
+
 UserSchema.virtual('password')
     .set(function(password){
+        console.log(password);
         this._password = password;
-        this.salt = this.makeSalt();
-        this.hashed_password = this.encryptPassword(password);
+        this.salt = UserSchema.method.makeSalt();
+        console.log('salt: ' ,this.salt);
+        this.hashed_password = UserSchema.method.encryptPassword(password, this.salt);
+        console.log('pass ', this.hashed_password);
     })
 
     .get(function() {
@@ -42,29 +48,41 @@ UserSchema.method = {
         return this.encryptPassword(plainText) === this.hashed_password;
     },
 
-    encryptPassword: function(password) {
-        if(!password) return '';
+    encryptPassword: function(password, salt) {
+        console.log('entre', password);
+        if(!password) 
+        {
+            console.log('if',password)
+            return '';
+
+        }
         try {
-            return crypto
-                .createHmac('sha1', this.salt)
-                .update(password)
-                .digest('hex')
+            // need to change crypto to crypto-js
+            const cr = crypto.createHmac('sha1', salt) 
+                        .update(password)
+                        .digest('hex')
+
+            console.log(cr);
+            return cr;
         } catch (error) {
+            console.log(error)
             return '';
         }
     },
 
-    maskeSalt: function() {
+    makeSalt: function() {
         return Math.round((new Date().valueOf() * Math.random()));
     }
 }
 
 UserSchema.path('hashed_password').validate(function (v) {
     if(this._password && this._password.lenght < 6) {
+        console.log('hola2');
         this.invalidate('password', 'Password must be at least 6 characters');
     }
 
     if(this.isNew && !this._password) {
+        console.log('hola');
         this.invalidate('password', 'Password is required');
     }
 }, null);

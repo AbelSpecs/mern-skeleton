@@ -24,6 +24,14 @@ app.use(helmet());
 app.use(cors());
 app.use('/', authRoutes);
 app.use('/', userRoutes);
+app.use((error, req, res) => {
+    if(error.name === 'UnauthorizedError') {
+        res.status(401).json({"error" : error.name + ": " + error.message});
+    }else if(error){
+        res.status(400).json({"error" : error.name + ": " + error.message});
+        console.log(error);
+    }
+});
 
 app.get('/', (req, res) => {
     res.status(200).send(template());
