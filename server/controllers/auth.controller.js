@@ -6,17 +6,20 @@ import config from './../../config/config';
 const signin = async (req, res) => {
     try {
         let user = await User.findOne({ email: req.body.email });
+        console.log('jwt',process.env.JWT_SECRET);
+        console.log('user', user);
         if(!user)
-            return res.status('401').json({ error: "User not found" });
+            return res.status(401).json({ error: "User not found" });
 
         if(!user.authenticate(req.body.password))
-            return res.status('401').json({ error: "Credentials do not match" });
+            return res.status(401).json({ error: "Credentials do not match" });
 
-        const token = jwt.sign({ _id: user._id}, config.jwtSecret)
+        const token = jwt.sign({ _id: user._id}, config.jwtSecret);
+        console.log(token);
 
-        res.cookie('divineMole', token, { expires: new Date() + 9999 })
+        res.cookie('divineMole', token, { expire: new Date(Date.now + 9999 )});
 
-        console.log(res);
+        console.log('res',res);
 
         return res.json({
             token, 
@@ -27,7 +30,7 @@ const signin = async (req, res) => {
             }
         })
     } catch (error) {
-        return res.status('401').json({ error: "Could not sign in" });
+        return res.status(401).json({ error: "Could not sign in" });
     }
 
 

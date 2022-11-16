@@ -33,19 +33,19 @@ UserSchema.virtual('password')
     .set(function(password){
         console.log(password);
         this._password = password;
-        this.salt = UserSchema.method.makeSalt();
+        this.salt = this.makeSalt();
         console.log('salt: ' ,this.salt);
-        this.hashed_password = UserSchema.method.encryptPassword(password, this.salt);
+        this.hashed_password = this.encryptPassword(password, this.salt);
         console.log('pass ', this.hashed_password);
     })
 
     .get(function() {
         return this._password;
-    })
+    });
 
-UserSchema.method = {
+UserSchema.methods = {
     authenticate: function(plainText){
-        return this.encryptPassword(plainText) === this.hashed_password;
+        return this.encryptPassword(plainText, this.salt) === this.hashed_password;
     },
 
     encryptPassword: function(password, salt) {

@@ -14,8 +14,8 @@ const CURRENT_WORKING_DIR = process.cwd();
 console.log(CURRENT_WORKING_DIR);
 const app = express();
 
-// app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')));
-// devBundle.compile(app);
+devBundle.compile(app);
+app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(cookieParser());
@@ -24,7 +24,7 @@ app.use(helmet());
 app.use(cors());
 app.use('/', authRoutes);
 app.use('/', userRoutes);
-app.use((error, req, res) => {
+app.use((error, req, res, next) => {
     if(error.name === 'UnauthorizedError') {
         res.status(401).json({"error" : error.name + ": " + error.message});
     }else if(error){
