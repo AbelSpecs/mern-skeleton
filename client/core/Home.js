@@ -5,7 +5,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import theme from "../theme";
-// import unicornbikeImg from './..assets/images/unicornbike.jpg';
+import purificationForce from './../assets/images/purificationForce.jpg';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -18,7 +18,24 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.openTitle
     },
     media: {
-        minHeight: 400
+        minHeight: 400,
+        backgroundSize: "contain"
     }
 }));
     
+export default function Home () {
+    const classes = useStyles();
+    return ( 
+        <Card className={classes.card}>
+            <Typography variant="h6" className={classes.title}>
+                Home Page
+            </Typography>
+            <CardMedia className={classes.media} image={purificationForce} title="Image"></CardMedia>
+            <CardContent>
+                <Typography variant="body2" component="p">
+                    Welcome to the MERN Skeleton home page.
+                </Typography>
+            </CardContent>
+        </Card>
+    )
+}
