@@ -6,6 +6,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import theme from "../theme";
 import purificationForce from './../assets/images/purificationForce.jpg';
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -36,6 +37,7 @@ export default function Home () {
                     Welcome to the MERN Skeleton home page.
                 </Typography>
             </CardContent>
+            <Link to="/users">Users</Link>
         </Card>
     )
 }

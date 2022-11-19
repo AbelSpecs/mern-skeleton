@@ -14,12 +14,13 @@ const create = async (user) => {
     }
 }
 
-const list = async () => {
+const list = async (signal) => {
     try {
         let response = await fetch('/api/users/', {
             method: 'GET',
-            // signal: signal
+            signal: signal
         });
+        console.log(response);
         return await response.json();
     } catch (error) {
         console.log(error);
