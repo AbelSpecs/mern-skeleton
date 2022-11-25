@@ -1,6 +1,7 @@
-import { Button, Card, CardActions, CardContent, DialogActions, DialogContent, DialogContentText, DialogTitle, Icon, TextField, Typography } from "@material-ui/core";
-import { create } from "lodash";
 import { useState } from "react";
+import { redirect } from "react-router";
+import { signin } from "../auth/api-auth";
+import auth from "../auth/auth-helper";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -28,14 +29,13 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function Signup() {
+export default function SignIn() {
     const classes = useStyles();
     const [values, setValues] = useState({
-        name: '',
-        password: '',
         email: '',
-        open: false,
-        error: ''
+        password: '',
+        error: '',
+        redirectToReferrer: false
     });
 
     const handleChange = (event) => {
@@ -47,19 +47,28 @@ export default function Signup() {
 
     const clickSubmit = () => {
         const user = {
-            name: values.name || undefined,
-            email: values.email || undefined,
-            password: values.password || undefined
+            email: values.email | undefined,
+            password: values.password | undefined
         }
 
-        create(user).then((data) => {
-            if(data.error){
+        signin(user).then(data => {
+            if(data.error)
                 setValues({...values, error: data.error});
-            }
-            else{
-                setValues({...values, error: '', open: true});
-            }
+            else    
+                auth.authenticate(data, () => {
+                    setValues({...values, error: '', redirectToReferrer: true})
+                })
         });
+
+        const {from} = props.location.state || {
+            from: {
+                pathname: '/'
+            }
+        }
+
+        const {redirectToReferrer} = values
+        if (redirectToReferrer) 
+            return (<redirect to={from}/>)
     }
 
     return (
@@ -67,12 +76,8 @@ export default function Signup() {
             <Card className={classes.card}>
                 <CardContent>
                     <Typography>
-                        Sign Up
+                        Sign In
                     </Typography>
-                    <TextField id="name" label="Name" className={classes.textField}
-                                value={values.name} onChange={handleChange('name')}
-                                margin="normal"/>
-                    <br/>
                     <TextField id="email" type="email" label="Email" className={classes.textField}
                                 value={values.email} onChange={handleChange('email')}
                                 margin="normal"/>
@@ -94,22 +99,7 @@ export default function Signup() {
                     </Button>
                 </CardActions>
             </Card>
-            <Dialog open={values.open} disableBackdropClick={true}>
-                <DialogTitle>New Account</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        New account successfully created
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Link to="/signin">
-                        <Button color="primary" autoFocus="autoFocus"
-                                variant="contained">
-                            Sign In
-                        </Button>
-                    </Link>
-                </DialogActions>
-            </Dialog>
         </div>
     )
+
 } 
