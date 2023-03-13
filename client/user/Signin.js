@@ -1,7 +1,18 @@
+import { 
+    Button,
+    Card,
+    CardContent,
+    Typography,
+    TextField,
+    CardActions, 
+    Icon
+} from "@material-ui/core";
 import { useState } from "react";
-import { redirect } from "react-router";
+import { useNavigate } from "react-router";
 import { signin } from "../auth/api-auth";
 import auth from "../auth/auth-helper";
+import { makeStyles } from "@material-ui/core/styles";
+import React from "react";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -30,45 +41,39 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function SignIn() {
+    const navigate = useNavigate();
+    
     const classes = useStyles();
     const [values, setValues] = useState({
         email: '',
         password: '',
-        error: '',
-        redirectToReferrer: false
+        error: ''
     });
 
-    const handleChange = (event) => {
+    const handleChange = name => event => {
         let value = event.target.value;
-        let name = event.target.name;
 
         setValues({...values, [name]: value});
     }
 
     const clickSubmit = () => {
         const user = {
-            email: values.email | undefined,
-            password: values.password | undefined
+            email: values.email || undefined,
+            password: values.password || undefined
         }
 
         signin(user).then(data => {
             if(data.error)
+            {
                 setValues({...values, error: data.error});
-            else    
-                auth.authenticate(data, () => {
-                    setValues({...values, error: '', redirectToReferrer: true})
-                })
-        });
-
-        const {from} = props.location.state || {
-            from: {
-                pathname: '/'
             }
-        }
-
-        const {redirectToReferrer} = values
-        if (redirectToReferrer) 
-            return (<redirect to={from}/>)
+            else
+            {
+                auth.authenticate(data, () => {
+                    navigate("/");
+                });
+            }    
+        });
     }
 
     return (

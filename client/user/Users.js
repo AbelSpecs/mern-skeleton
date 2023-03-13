@@ -1,10 +1,21 @@
 import React from "react";
-import { Avatar, Person, IconButton, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, Paper, Typography } from "@material-ui/core";
+import { 
+    Avatar, 
+    IconButton, 
+    List, 
+    ListItem, 
+    ListItemAvatar, 
+    ListItemSecondaryAction, 
+    ListItemText, 
+    Paper, 
+    Typography 
+} from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { list } from "./api-user";
 import { Link } from "react-router-dom";
 import { ArrowForward } from "@material-ui/icons";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@material-ui/core/styles";
+import Person from '@material-ui/icons/Person';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -51,11 +62,11 @@ export default function Users() {
             </Typography>
             <List dense>
                 {users.map((item, i) => {
-                    return <Link to={"/user" + item._id} key={i} className={classes.textDecoration}>
+                    return <Link to={"/user/" + item._id} key={i} className={classes.textDecoration}>
                                 <ListItem button>
                                     <ListItemAvatar>
                                         <Avatar>
-                                            {/** avatar */}
+                                            <Person/>
                                         </Avatar>
                                     </ListItemAvatar>
                                     <ListItemText primary={item.name}/>

@@ -9,6 +9,18 @@ import userRoutes from './routes/user.routes';
 import devBundle from './devBundle';
 import path from 'path';
 import authRoutes from './routes/auth.routes';
+//React modules
+import React  from 'react';
+import ReactDOMServer from 'react-dom/server';
+// Router Modules
+import {StaticRouter} from 'react-router-dom/server';
+import MainRouter from '../client/MainRouter';
+// Material UI Modules 
+import { ServerStyleSheets, ThemeProvider } from '@material-ui/styles';
+import theme from '../client/theme';
+import createEmotionCache from './createEmotionCache';
+import createEmotionServer from '@emotion/server/create-instance';
+import { CacheProvider } from '@emotion/react';
 
 const CURRENT_WORKING_DIR = process.cwd();
 console.log(CURRENT_WORKING_DIR);
@@ -33,8 +45,39 @@ app.use((error, req, res, next) => {
     }
 });
 
-app.get('/', (req, res) => {
-    res.status(200).send(template());
+app.get('*', (req, res) => {
+    // const sheets = new ServerStyleSheets();
+    const cache = createEmotionCache();
+    const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache);
+    const context = {};
+    const markup = ReactDOMServer.renderToString(
+        // sheets.collect(
+            <StaticRouter location={req.url} context={context}>
+                <CacheProvider value={cache}>
+                    <ThemeProvider theme={theme}>
+                        <MainRouter/>
+                    </ThemeProvider>
+                </CacheProvider>
+            </StaticRouter>       
+        // )
+    );
+    
+    if(context.url){
+        return res.redirect(303, context.url);
+    }
+
+    const emotionChunks = extractCriticalToChunks(markup);
+    const emotionCss = constructStyleTagsFromChunks(emotionChunks);
+    // const css = sheets.toString();
+    res.status(200).send(template({
+        markup: markup,
+        css: emotionCss
+    }))
+
 });
+
+// app.get('/', (req, res) => {
+//     res.status(200).send(template())});
+
 
 export default app;

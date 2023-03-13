@@ -27,7 +27,9 @@ const list = async (signal) => {
     }
 }
 
-const read = async (params, credentials, signal) => {
+const read = async ({params, credentials, signal}) => {
+    console.log(params);
+    console.log(credentials);
     try {
         let response = await fetch('/api/users/' + params.userId, {
             method: 'GET',
@@ -38,13 +40,14 @@ const read = async (params, credentials, signal) => {
                 'Authorization': 'Bearer ' + credentials.divineMole
             }
         });
+        console.log(response);
         return await response.json();
     } catch (error) {
         console.log(error);
     }
 }
 
-const update = async (params, credentials, user) => {
+const update = async ({params, credentials, user}) => {
     try {
         let response = await fetch('/api/users/' + params.userId, {
             method: 'PUT',
@@ -61,7 +64,7 @@ const update = async (params, credentials, user) => {
     }
 }
 
-const remove = async (params, credentials) => {
+const remove = async ({params, credentials}) => {
     try {
         let response = await fetch('/api/users/' + params.userId, {
             method: 'DELETE',

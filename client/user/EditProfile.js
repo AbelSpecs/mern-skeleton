@@ -1,10 +1,55 @@
-import { set, update } from "lodash";
+import { 
+    Button,
+    Card,
+    CardContent,
+    Typography,
+    TextField,
+    CardActions, 
+    Icon
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/styles";
+import { isNull } from "lodash";
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import auth from "../auth/auth-helper";
-import { read } from "./api-user";
+import { read, update } from "./api-user";
+import React from "react";
 
-export default function EditProfile({ match }) {
-    const [user, setUser] = useState({});
+const useStyles = makeStyles(theme => ({
+    card: {
+      maxWidth: 600,
+      margin: 'auto',
+      textAlign: 'center',
+      marginTop: theme.spacing(5),
+      paddingBottom: theme.spacing(2)
+    },
+    title: {
+      margin: theme.spacing(2),
+      color: theme.palette.protectedTitle
+    },
+    error: {
+      verticalAlign: 'middle'
+    },
+    textField: {
+      marginLeft: theme.spacing(1),
+      marginRight: theme.spacing(1),
+      width: 300
+    },
+    submit: {
+      margin: 'auto',
+      marginBottom: theme.spacing(2)
+    }
+  }))
+
+export default function EditProfile() {
+    const classes = useStyles();
+    const userId = useParams();
+    const navigate = useNavigate();
+    const jwt = auth.isAuthenticated();
+    const [user, setUser] = useState({
+        name: '',
+        email: ''
+    });
     const [redirectToSigin, setRedirectToSignin] = useState(false);
     const [values, setValues] = useState({
         name: '',
@@ -17,10 +62,9 @@ export default function EditProfile({ match }) {
     useEffect(() => {
         const abortController = new AbortController();
         const signal = abortController.signal;
-        const jwt = auth.isAuthenticated();
-
+        
         read({
-            params: { userId: match.params.userId },
+            params: { userId: userId.userId },
             credentials: { divineMole: jwt.token },
             signal
         }).then(data => {
@@ -33,24 +77,28 @@ export default function EditProfile({ match }) {
         return function cleanup() {
             abortController.abort();
         } 
-    }, [match.params.userId]);
+    }, [userId.userId]);
 
-    const handleChange = (event) => {
+    const handleChange = name => event => {
         let value = event.target.value;
-        let name = event.target.name;
 
         setValues({...values, [name]: value});
     }
 
     const clickSubmit = () => {
+        const { password } = values;
+
         const user = {
-            name: values.name | undefined,
-            email: values.email | undefined,
-            password: values.password | undefined
+            name: values.name || undefined,
+            email: values.email || undefined,
+            password: values.password || undefined
         }
 
+        if(isNull(password))
+            delete user.password;
+
         update({
-            params: { userId: match.params.userId },
+            params: { userId: userId.userId },
             credentials: { divineMole: jwt.token },
             user
         }).then(data => {
@@ -63,10 +111,12 @@ export default function EditProfile({ match }) {
     }
 
     if(redirectToSigin)
-        return (<redirect to='/signin'/>)
+        // return (<redirect to='/signin'/>);
+        navigate('/signin');
 
     if(values.redirectToProfile)
-        return (<redirect to={'/user/' + match.params.userId}/>)
+        // return (<redirect to={'/user/' + userId.userId}/>)
+        navigate('/user/' + userId.userId);
     
     return(
         <div>

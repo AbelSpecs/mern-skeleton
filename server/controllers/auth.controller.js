@@ -48,7 +48,7 @@ const requireSignin = expressjwt({
     algorithms: ["HS256"]
 });
 
-const hasAuthorization = (req, res) => {
+const hasAuthorization = (req, res, next) => {
     const authorized = req.profile && req.auth && req.profile._id == req.auth._id;
 
     if(!(authorized)){

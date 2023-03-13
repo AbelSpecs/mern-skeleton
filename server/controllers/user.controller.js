@@ -31,6 +31,7 @@ const list = async (req, res) => {
 const read = (req, res) => {
     req.profile.hashed_password = undefined;
     req.profile.salt = undefined;
+    console.log(req.profile);
     return res.json(req.profile);
 }
 
@@ -67,6 +68,7 @@ const remove = async (req, res) => {
 const userById = async (req, res, next, id) => {
     try {
         const user = await User.findById(id);
+        console.log(user);
         if(!user){
             return res.status(400).json({
                 error: errorHandler.getErrorMessage(error)

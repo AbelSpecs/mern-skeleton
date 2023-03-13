@@ -1,6 +1,22 @@
-import { Button, Card, CardActions, CardContent, DialogActions, DialogContent, DialogContentText, DialogTitle, Icon, TextField, Typography } from "@material-ui/core";
-import { create } from "lodash";
+import { 
+    Button, 
+    Card, 
+    CardActions, 
+    CardContent, 
+    Dialog, 
+    DialogActions, 
+    DialogContent, 
+    DialogContentText, 
+    DialogTitle, 
+    Icon, 
+    TextField, 
+    Typography 
+} from "@material-ui/core";
+import { Link } from "react-router-dom";
+import { create } from "./api-user";
 import { useState } from "react";
+import { makeStyles } from "@material-ui/styles";
+import React from "react";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -38,11 +54,14 @@ export default function Signup() {
         error: ''
     });
 
-    const handleChange = (event) => {
+    const handleChange = name => event => {
         let value = event.target.value;
-        let name = event.target.name;
 
         setValues({...values, [name]: value});
+    }
+
+    const handleClose = () => {
+        setValues({...values, open: false});
     }
 
     const clickSubmit = () => {
@@ -57,7 +76,7 @@ export default function Signup() {
                 setValues({...values, error: data.error});
             }
             else{
-                setValues({...values, error: '', open: true});
+                setValues({...values, error: '', name: '', password: '', email: '', open: true});
             }
         });
     }
@@ -94,7 +113,7 @@ export default function Signup() {
                     </Button>
                 </CardActions>
             </Card>
-            <Dialog open={values.open} disableBackdropClick={true}>
+            <Dialog open={values.open} onClose={handleClose}>
                 <DialogTitle>New Account</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
